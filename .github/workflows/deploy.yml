@@ -8,16 +8,13 @@ jobs:
   build:
     runs-on: self-hosted
 
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
-    # - run: npm test
+
+    # cache 설정 제거함 & node-version 명시 제거 (EC2에 깔린거 그대로 사용)
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Restart Server
+      run: |
+        pm2 restart github-deploy || pm2 start app.js --name "github-deploy" --watch
